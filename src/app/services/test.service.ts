@@ -6,14 +6,14 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class TestService {
-  baseURL: string = "http://localhost:9000";
+  baseURL: string = "https://productivitytool.mustach.co";
 
   constructor(public http: HttpClient) {
 
   }
 
   getTest1(): Observable<string> {
-    return this.http.get<string>(`${this.baseURL}/api/test1`);
+    return this.http.get(`${this.baseURL}/api/test1`,  { responseType: 'text' });
   }
 
   getTest2(): Observable<TestItem[]> {
