@@ -8,7 +8,8 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
+ARG ENV=production
+RUN npm run build -- --configuration=$ENV
 
 FROM nginx:stable
 
