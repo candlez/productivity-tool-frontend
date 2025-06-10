@@ -1,0 +1,146 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run tests
+      run: npm test
+
+  build-dev:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up QEMU (for ARM emulation)
+      uses: docker/setup-qemu-action@v3
+
+    - name: Log in to Dockerhub
+      uses: docker/login-action@v3
+      with:
+        username: thomasmcnamara7
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Get short SHA
+      run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+    - name: Build and push image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: thomasmcnamara7/productivity-tool-frontend:dev-${{ env.SHORT_SHA }}
+        platforms: linux/arm64
+        build-args: |
+          ENV=development
+
+  deploy-dev:
+    runs-on: ubuntu-latest
+    needs: build-dev
+    environment:
+      name: development
+
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    
+    - name: Get short SHA
+      run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+    - name: Update task definition
+      id: render-task-definition
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition-family: productivity-tool-frontend
+        container-name: frontend-nginx
+        image: thomasmcnamara7/productivity-tool-frontend:dev-${{ env.SHORT_SHA }}
+
+    - name: Update ECS service
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+      with:
+        task-definition: ${{ steps.render-task-definition.outputs.task-definition }}
+        service: productivity-tool-frontend-service-ahox6l3y
+        cluster: productivity-tool-dev
+
+  build-prod:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: deploy-dev
+    environment:
+      name: production
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up QEMU (for ARM emulation)
+      uses: docker/setup-qemu-action@v3
+
+    - name: Log in to Dockerhub
+      uses: docker/login-action@v3
+      with:
+        username: thomasmcnamara7
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Get short SHA
+      run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+    - name: Build and push image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: thomasmcnamara7/productivity-tool-frontend:prod-${{ env.SHORT_SHA }}
+        platforms: linux/arm64
+        build-args: |
+          ENV=production
+  
+  deploy-prod:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: build-prod
+    environment:
+      name: production
+    
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Get short SHA
+      run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+    - name: Update task definition
+      id: render-task-definition
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition-family: productivity-tool-frontend
+        container-name: frontend-nginx
+        image: thomasmcnamara7/productivity-tool-frontend:prod-${{ env.SHORT_SHA }}
+
+    - name: Update ECS service
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+      with:
+        task-definition: ${{ steps.render-task-definition.outputs.task-definition }}
+        service: productivity-tool-frontend-service-j018ru7h
+        cluster: productivity-tool
