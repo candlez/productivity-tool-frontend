@@ -5,7 +5,7 @@ import { NavHeaderComponent } from "./components/nav-header/nav-header.component
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NavHeaderComponent],
+  imports: [RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
