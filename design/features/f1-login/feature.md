@@ -14,3 +14,6 @@ Unauthenticated users should be redirected to the login page when attempting to 
 
 
 For routes that don't exist, users should be redirected to a not found page.
+
+
+Users need to be able to sign up. Make a page where they can do so.
