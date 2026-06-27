@@ -11,3 +11,6 @@ Users need to be able to enter their credentials so they can access restricted c
 
 
 Unauthenticated users should be redirected to the login page when attempting to access restricted pages.
+
+
+For routes that don't exist, users should be redirected to a not found page.
