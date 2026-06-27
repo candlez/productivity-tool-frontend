@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { NgFor, NgIf } from '@angular/common';
+
 
 import { TestItem, TestService } from './services/test.service';
 
 @Component({
   selector: 'app-root',
-  imports: [NgIf, NgFor],
+  imports: [],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -40,6 +40,6 @@ export class AppComponent implements OnInit {
         console.error(error);
         this.loaded--;
       }
-    })
+    });
   }
 }
