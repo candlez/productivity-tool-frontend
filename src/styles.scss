@@ -1,9 +1,23 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+@use './theme-colors' as theme;
+
+html {
+  @include mat.theme((
+    color: (
+      theme-type: light,
+      primary: theme.$primary-palette,
+      tertiary: theme.$tertiary-palette,
+    ),
+    typography: Carlito,
+    density: 0,
+  ));
+}
 
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  background-color: #E5E4E2;
 }
 
 .carlito-regular {

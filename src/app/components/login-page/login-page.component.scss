@@ -1,0 +1,74 @@
+#login-page-holder {
+    height: calc(100vh - 50px);
+    z-index: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+#blurer {
+    backdrop-filter: blur(1px);
+    height: calc(100vh - 50px);
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+}
+
+#login-form-holder {
+    border: solid 2px var(--mat-sys-on-surface-variant);
+    border-radius: 5px;
+    margin-top: 20vh;
+    height: min-content;
+    width: 20vw;
+    display: flex;
+    background-color: var(--mat-sys-surface);
+    align-items: center;
+    flex-direction: column;
+}
+
+#backdrop {
+    background-image: url("/cloud_texture.jpg");
+    background-repeat: repeat;
+    animation: constantMotion 60s linear infinite;
+    position: absolute;
+    z-index: -1;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 100vw;
+}
+
+@keyframes constantMotion {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -360px 0;
+  }
+}
+
+#login-header-text {
+    margin: 25px 0 0 0;
+    font-size: xx-large;
+    color: var(--mat-sys-on-surface-variant);
+    height: auto;
+}
+
+#form-holder {
+    margin: 2vh 0 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-item {
+    margin: 0 auto 0 auto;
+    border-radius: 5px;
+}
+
+.form-input {
+    width: 16vw;
+}
+
+#submit-button {
+    background-color: var(--mat-sys-on-surface-variant);
+}

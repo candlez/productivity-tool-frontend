@@ -1,1 +1,20 @@
-<p>login-page works!</p>
+<div id="login-page-holder">
+    <div id="blurer">
+        <div id="login-form-holder">
+            <p class="carlito-bold" id="login-header-text">SIGN IN</p>
+            <form (ngSubmit)="submitForm()" [formGroup]="form" id="form-holder">
+                <mat-form-field appearance="fill" floatLabel="always" class="form-item form-input">
+                    <mat-label>Email</mat-label>
+                    <input matInput formControlName="username">
+                </mat-form-field>
+                <mat-form-field floatLabel="always" id="description" class="form-item form-input">
+                    <mat-label>Password</mat-label>
+                    <input matInput [type]="'password'" formControlName="password">
+                </mat-form-field>
+                <button matButton="filled" type="submit" id="submit-button" class="form-item">Submit</button>
+            </form>
+        </div>
+    </div>
+    <div id="backdrop"></div>
+</div>
+
