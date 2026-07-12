@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatButton } from "@angular/material/button";
+import { AuthService } from '../../services/auth.service';
 
 
 @Component({
@@ -20,7 +21,7 @@ import { MatButton } from "@angular/material/button";
 export class LoginPageComponent {
   form: FormGroup;
 
-  constructor(private formBuilder: FormBuilder) {
+  constructor(private formBuilder: FormBuilder, private authService: AuthService) {
     this.form = this.formBuilder.group({
       username: [''],
       password: ['']
@@ -28,6 +29,9 @@ export class LoginPageComponent {
   }
 
   submitForm(): void {
-    console.log(this.form.value.username, this.form.value.password);
+    this.authService.login(this.form.value.username, this.form.value.password).subscribe({
+      next: (data: any) => console.log(data),
+      error: (err: any) => console.error(err)
+    });
   }
 }
