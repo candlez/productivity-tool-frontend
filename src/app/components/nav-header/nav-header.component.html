@@ -1,4 +1,8 @@
 <div id="nav-header-holder" class="carlito-bold">
     <a routerLink="/home" class="nav-link">HOME</a>
-    <a routerLink="/login" class="nav-link">LOGIN</a>
+    @if (isLoggedIn()) {
+        <a routerLink="/habits" class="nav-link">HABITS</a>
+    } @else { 
+        <a routerLink="/login" class="nav-link">LOGIN</a>
+    }
 </div>

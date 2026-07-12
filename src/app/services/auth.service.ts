@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { map, Observable, of, tap } from 'rxjs';
+import { computed, Injectable, signal, WritableSignal } from '@angular/core';
+import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { ApiResponseDto } from '../data/dto/rest/ApiResponse.dto';
 import { SingleItemDto } from '../data/dto/rest/SingleItem.dto';
 import { UserResponseDto } from '../data/dto/UserResponse.dto';
@@ -13,7 +13,10 @@ import { UserMapper } from '../data/mapper/User.mapper';
 })
 export class AuthService {
 
-  private user: User | undefined = undefined;
+  private readonly user: WritableSignal<User | undefined> = signal<User | undefined>(undefined);
+
+  // this signal is exposed to let components know whether the user is logged in
+  readonly isLoggedIn = computed(() => this.user() !== undefined);
 
   constructor(private http: HttpClient) {
 
@@ -23,18 +26,20 @@ export class AuthService {
     return this.http.post<ApiResponseDto<SingleItemDto<UserResponseDto>>>(
       "api/v1/auth/login",
       { email, password }
-    ).pipe(map(
-      (res: ApiResponseDto<SingleItemDto<UserResponseDto>>) => 
-        Mapper.mapSingleItem<UserResponseDto, User>(res, UserMapper.fromUserResponseDto)
-    ));
+    ).pipe(
+      map(
+        (res: ApiResponseDto<SingleItemDto<UserResponseDto>>) => 
+          Mapper.mapSingleItem<UserResponseDto, User>(res, UserMapper.fromUserResponseDto)
+      ),
+      tap((res: User) => this.user.set(res)),
+      catchError((err: any) => {
+        this.user.set(undefined);
+        return throwError(() => err);
+      })
+    );
   }
 
   public getUser(): Observable<User> {
-    if (this.user !== undefined) {
-      console.log("cache hit")
-      return of(this.user);
-    }
-
     return this.http.get<ApiResponseDto<SingleItemDto<UserResponseDto>>>(
       "api/v1/auth/me",
       { withCredentials: true }
@@ -43,8 +48,29 @@ export class AuthService {
         (res: ApiResponseDto<SingleItemDto<UserResponseDto>>) => 
           Mapper.mapSingleItem<UserResponseDto, User>(res, UserMapper.fromUserResponseDto)
       ),
-      tap((user: User) => { this.user = user })
+      tap((res: User) => this.user.set(res)),
+      catchError((err: any) => {
+        this.user.set(undefined);
+        return throwError(() => err);
+      })
     );
   }
-  
+
+  public initializeUser(): Observable<void> {
+    return this.http.get<ApiResponseDto<SingleItemDto<UserResponseDto>>>(
+      "api/v1/auth/me",
+      { withCredentials: true }
+    ).pipe(
+      map(
+        (res: ApiResponseDto<SingleItemDto<UserResponseDto>>) => 
+          Mapper.mapSingleItem<UserResponseDto, User>(res, UserMapper.fromUserResponseDto)
+      ),
+      tap((res: User) => this.user.set(res)),
+      map(() => undefined),
+      catchError(() => {
+        this.user.set(undefined);
+        return of(undefined);
+      })
+    );
+  }
 }
