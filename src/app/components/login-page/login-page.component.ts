@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angul
 import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatButton } from "@angular/material/button";
 import { AuthService } from '../../services/auth.service';
+import { User } from '../../data/domain/User';
 
 
 @Component({
@@ -30,7 +31,7 @@ export class LoginPageComponent {
 
   submitForm(): void {
     this.authService.login(this.form.value.username, this.form.value.password).subscribe({
-      next: (data: any) => console.log(data),
+      next: (data: User) => console.log(data),
       error: (err: any) => console.error(err)
     });
   }
