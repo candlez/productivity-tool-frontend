@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { map, Observable, of, tap } from 'rxjs';
 import { ApiResponseDto } from '../data/dto/rest/ApiResponse.dto';
 import { SingleItemDto } from '../data/dto/rest/SingleItem.dto';
 import { UserResponseDto } from '../data/dto/UserResponse.dto';
@@ -12,6 +12,8 @@ import { UserMapper } from '../data/mapper/User.mapper';
   providedIn: 'root',
 })
 export class AuthService {
+
+  private user: User | undefined = undefined;
 
   constructor(private http: HttpClient) {
 
@@ -25,6 +27,24 @@ export class AuthService {
       (res: ApiResponseDto<SingleItemDto<UserResponseDto>>) => 
         Mapper.mapSingleItem<UserResponseDto, User>(res, UserMapper.fromUserResponseDto)
     ));
+  }
+
+  public getUser(): Observable<User> {
+    if (this.user !== undefined) {
+      console.log("cache hit")
+      return of(this.user);
+    }
+
+    return this.http.get<ApiResponseDto<SingleItemDto<UserResponseDto>>>(
+      "api/v1/auth/me",
+      { withCredentials: true }
+    ).pipe(
+      map(
+        (res: ApiResponseDto<SingleItemDto<UserResponseDto>>) => 
+          Mapper.mapSingleItem<UserResponseDto, User>(res, UserMapper.fromUserResponseDto)
+      ),
+      tap((user: User) => { this.user = user })
+    );
   }
   
 }
