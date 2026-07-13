@@ -1,1 +1,6 @@
 <p>habits-page works!</p>
+@for (habit of habits(); track habit.id) {
+    <p>{{ habit.name }}</p>
+    <p>{{ habit.description }}</p>
+    <br>
+}
