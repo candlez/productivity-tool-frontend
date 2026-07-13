@@ -7,6 +7,8 @@ import { UserResponseDto } from '../data/dto/UserResponse.dto';
 import { User } from '../data/domain/User';
 import { Mapper } from '../data/util/Mapper';
 import { UserMapper } from '../data/mapper/User.mapper';
+import { DeletedDto } from '../data/dto/rest/Deleted.dto';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +20,7 @@ export class AuthService {
   // this signal is exposed to let components know whether the user is logged in
   readonly isLoggedIn = computed(() => this.user() !== undefined);
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
 
   }
 
@@ -70,6 +72,19 @@ export class AuthService {
       catchError(() => {
         this.user.set(undefined);
         return of(undefined);
+      })
+    );
+  }
+
+  public logout(): Observable<void> {
+    return this.http.post<ApiResponseDto<DeletedDto>>(
+      "api/v1/auth/logout",
+      {}
+    ).pipe(
+      map(() => undefined),
+      tap(() => { 
+        this.user.set(undefined);
+        this.router.navigate(["/login"]);
       })
     );
   }

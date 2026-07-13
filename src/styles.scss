@@ -43,3 +43,13 @@ body {
   font-weight: 700;
   font-style: italic;
 }
+
+// standard error snackbar overrides (unfortunately)
+.error-snackbar .mat-mdc-snackbar-surface {
+  background-color: var(--mat-sys-error) !important;
+  color: var(--mat-sys-on-error) !important;
+}
+
+.error-snackbar .mat-mdc-button {
+  color: var(--mat-sys-on-error) !important;
+}
