@@ -4,6 +4,7 @@ import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatButton } from "@angular/material/button";
 import { AuthService } from '../../services/auth.service';
 import { User } from '../../data/domain/User';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -22,7 +23,7 @@ import { User } from '../../data/domain/User';
 export class LoginPageComponent {
   form: FormGroup;
 
-  constructor(private formBuilder: FormBuilder, private authService: AuthService) {
+  constructor(private formBuilder: FormBuilder, private authService: AuthService, private router: Router) {
     this.form = this.formBuilder.group({
       username: [''],
       password: ['']
@@ -31,7 +32,10 @@ export class LoginPageComponent {
 
   submitForm(): void {
     this.authService.login(this.form.value.username, this.form.value.password).subscribe({
-      next: (data: User) => console.log(data),
+      next: (data: User) => {
+        // this default redirect is subject to change (and probably will change)
+        this.router.navigate(["/habits"]);
+      },
       error: (err: any) => console.error(err)
     });
   }
