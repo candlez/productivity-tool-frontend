@@ -1,1 +1,55 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+@use './theme-colors' as theme;
+
+html {
+  @include mat.theme((
+    color: (
+      theme-type: light,
+      primary: theme.$primary-palette,
+      tertiary: theme.$tertiary-palette,
+    ),
+    typography: Carlito,
+    density: 0,
+  ));
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: #E5E4E2;
+}
+
+.carlito-regular {
+  font-family: "Carlito", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.carlito-bold {
+  font-family: "Carlito", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.carlito-regular-italic {
+  font-family: "Carlito", sans-serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.carlito-bold-italic {
+  font-family: "Carlito", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+// standard error snackbar overrides (unfortunately)
+.error-snackbar .mat-mdc-snackbar-surface {
+  background-color: var(--mat-sys-error) !important;
+  color: var(--mat-sys-on-error) !important;
+}
+
+.error-snackbar .mat-mdc-button {
+  color: var(--mat-sys-on-error) !important;
+}
